@@ -18,7 +18,7 @@
             <div class="column">
                 <div class="form-group">
                     <label class="form-label">Provider</label>
-                    <input class="form-input" type="text" placeholder="FR, BX..." v-model="provider">
+                    <input class="form-input" type="text" placeholder="TT, BX, CA..." v-model="provider">
                 </div>
                 <div class="form-group">
                     <label class="form-label">File</label>
@@ -33,23 +33,27 @@
             </div>
         </div>
 
-        <br>
+               <br>
         <p>
             Processed image
             <br>
-            <img :src="'data:image/gif;base64,' + processed" alt="" srcset="">
+            <template v-if="processed">
+                <img :src="'data:image/png;base64,' + processed" alt="" srcset="">
+            </template>
         </p>
-
         <p>
             Original
             <br>
-            <img :src="'data:image/gif;base64,' + original" alt="" srcset="">
+            <template v-if="original">
+                <img :src="'data:image/png;base64,' + original" alt="" srcset="">
+            </template>
         </p>
-
         <p>
             Result
             <br>
-            {{ result }}
+            <template v-if="result">
+                {{ result }}
+            </template>
         </p>
     </div>
 </body>
