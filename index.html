@@ -18,7 +18,7 @@
             <div class="column">
                 <div class="form-group">
                     <label class="form-label">Provider</label>
-                    <input class="form-input" type="text" placeholder="TT, BX, CA..." v-model="provider">
+                    <input class="form-input" type="text" placeholder="FR, BX..." v-model="provider">
                 </div>
                 <div class="form-group">
                     <label class="form-label">File</label>
@@ -33,7 +33,7 @@
             </div>
         </div>
 
-               <br>
+        <br>
         <p>
             Processed image
             <br>
@@ -41,6 +41,7 @@
                 <img :src="'data:image/png;base64,' + processed" alt="" srcset="">
             </template>
         </p>
+
         <p>
             Original
             <br>
@@ -48,11 +49,15 @@
                 <img :src="'data:image/png;base64,' + original" alt="" srcset="">
             </template>
         </p>
+
         <p>
             Result
             <br>
             <template v-if="result">
                 {{ result }}
+            </template>
+            <template v-else-if="processed">
+                No results, low probability of prediction
             </template>
         </p>
     </div>
@@ -100,9 +105,9 @@
                         provider: provider,
                         image: image
                     }).then(resp => {
-                        this.processed = resp.processed
-                        this.original = resp.original
-                        this.result = resp.result
+                        this.processed = resp.data.preprocessed
+                        this.original = resp.data.origin.replace("========", "")
+                        this.result = resp.data.result
 
                         this.loading = false;
                     }).catch(error => {
