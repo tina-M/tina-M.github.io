@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <script src="https://cdn.jsdelivr.net/npm/vue"></script>
+    <link rel="stylesheet" href="https://unpkg.com/spectre.css/dist/spectre.min.css">
+    <link rel="stylesheet" href="https://unpkg.com/spectre.css/dist/spectre-exp.min.css">
+    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+</head>
+
+<body>
+    <div class="container grid-lg" id="app">
+        <h1>Predict text on captcha image</h1>
+        <div class="columns">
+            <div class="column">
+                <div class="form-group">
+                    <label class="form-label">Provider</label>
+                    <input class="form-input" type="text" placeholder="FR, BX..." v-model="provider">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">File</label>
+                    <input class="form-input" type="file" ref="imageField">
+                </div>
+            </div>
+        </div>
+        <p></p>
+        <div class="columns">
+            <div class="column">
+                <button class="btn btn-primary" @click="sendImage" :class="{loading: loading}">Predict</button>
+            </div>
+        </div>
+
+        <br>
+        <p>
+            Processed image
+            <br>
+            <img :src="'data:image/gif;base64,' + processed" alt="" srcset="">
+        </p>
+
+        <p>
+            Original
+            <br>
+            <img :src="'data:image/gif;base64,' + original" alt="" srcset="">
+        </p>
+
+        <p>
+            Result
+            <br>
+            {{ result }}
+        </p>
+    </div>
+</body>
+
+<script>
+    const API_URL = " https://icarus.data-acq-sandbox.skypicker.com/api/predict"
+    var app = new Vue({
+        el: '#app',
+        data: {
+            provider: "",
+            processed: null,
+            original: null,
+            result: null,
+            loading: false
+        },
+        methods: {
+            sendImage(event) {
+                this.processed = null
+                this.original = null
+                this.result = null
+
+                if (this.$refs.imageField.files.length === 0) {
+                    alert("Image is required")
+                    return
+                }
+
+                var provider = this.provider || ""
+                new Promise((resolve, reject) => {
+                    var reader = new FileReader();
+
+                    reader.onloadend = () => resolve(reader.result)
+
+                    reader.readAsDataURL(this.$refs.imageField.files[0]);
+                }).then(image => {
+                    this.loading = true;
+                    image = image.replace('data:image/gif;base64,', "")
+                    image = image.replace('data:image/png;base64,', "")
+                    image = image.replace('data:image/jpg;base64,', "")
+
+                    // https://gist.github.com/perrygeo/ee7c65bb1541ff6ac770
+                    image += "========"
+
+                    axios.post(API_URL, {
+                        provider: provider,
+                        image: image
+                    }).then(resp => {
+                        this.processed = resp.processed
+                        this.original = resp.original
+                        this.result = resp.result
+
+                        this.loading = false;
+                    }).catch(error => {
+                        console.log(error.response);
+
+                        alert(error.response.data.title);
+
+                        this.loading = false;
+                    })
+
+                })
+
+                this.provider = null
+                this.$refs.imageField.value = null
+            }
+        }
+    })
+</script>
+
+</html>
