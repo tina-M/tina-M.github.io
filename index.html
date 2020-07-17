@@ -35,18 +35,18 @@
 
         <br>
         <p>
-            Processed image
-            <br>
-            <template v-if="processed">
-                <img :src="'data:image/png;base64,' + processed" alt="" srcset="">
-            </template>
-        </p>
-
-        <p>
             Original
             <br>
             <template v-if="original">
                 <img :src="'data:image/png;base64,' + original" alt="" srcset="">
+            </template>
+        </p>
+        
+        <p>
+            Processed image
+            <br>
+            <template v-if="processed">
+                <img :src="'data:image/png;base64,' + processed" alt="" srcset="">
             </template>
         </p>
 
